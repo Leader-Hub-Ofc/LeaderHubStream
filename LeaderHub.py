@@ -45,7 +45,7 @@ print(C + "\n[+] Initializing VITHU DEV..." + RESET)
 time.sleep(1)
 
 logs = [
-    "Loading Python modules",
+    "Loading Python Admin Vithu",
     "Checking environment",
     "Loading LeaderHub components",
     "Preparing terminal interface",

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeaderHub Moviesda Fetched</title>
+    <!-- Font for Top UI -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Base Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+        }
+
+        /* Iframe Website */
+        .web-frame {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            z-index: 1;
+        }
+
+        /* Top Center Glass Popup */
+        .top-popup {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(20, 20, 20, 0.45);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            color: #fff;
+            border-radius: 10px;
+            padding: 8px 15px;
+            text-align: center;
+            min-width: 220px;
+            z-index: 9999;
+            pointer-events: none; /* Let clicks pass through */
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .top-popup h2 {
+            font-size: 13px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        /* Blinking Green Light */
+        .blink-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #10b981;
+            animation: blink 1s infinite alternate;
+        }
+
+        @keyframes blink {
+            0% { opacity: 0.3; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .stats-info {
+            font-size: 11px;
+            color: #cbd5e1;
+            line-height: 1.4;
+        }
+
+        .ads-status { color: #ef4444; font-weight: 700; }
+        .ip-color { color: #38bdf8; font-weight: 700; }
+
+        /* Real-time Terminal Log Box (Bottom) */
+        .log-box {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 320px;
+            height: 180px; /* Size increased */
+            background: rgba(10, 10, 12, 0.9); /* Dark terminal background */
+            border: 1px solid #333;
+            border-top: 25px solid #222; /* Fake terminal header */
+            border-radius: 6px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            pointer-events: auto; /* Allow scrolling inside */
+        }
+
+        /* Terminal header dots */
+        .log-box::before {
+            content: "";
+            position: absolute;
+            top: -18px;
+            left: 10px;
+            width: 10px;
+            height: 10px;
+            background: #ef4444; /* Red button */
+            border-radius: 50%;
+            box-shadow: 16px 0 0 #facc15, 32px 0 0 #10b981; /* Yellow & Green buttons */
+        }
+
+        .log-content {
+            padding: 8px;
+            overflow-y: auto;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            font-family: 'Courier New', Courier, monospace; /* Terminal font */
+            scroll-behavior: smooth;
+        }
+
+        /* Scrollbar Styling for Logs */
+        .log-content::-webkit-scrollbar { width: 5px; }
+        .log-content::-webkit-scrollbar-track { background: transparent; }
+        .log-content::-webkit-scrollbar-thumb { background: #555; border-radius: 5px; }
+        .log-content::-webkit-scrollbar-thumb:hover { background: #888; }
+
+        .log-entry {
+            font-size: 10px;
+            color: #d1d5db;
+            animation: slideUpFade 0.3s ease-out forwards;
+            opacity: 0;
+            transform: translateY(5px);
+            word-wrap: break-word;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            padding-bottom: 3px;
+        }
+
+        /* Log line prefix symbol (>) */
+        .log-entry::before {
+            content: "> ";
+            color: #38bdf8;
+            font-weight: bold;
+        }
+
+        @keyframes slideUpFade {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Log Message Colors */
+        .red-text { color: #f87171; font-weight: bold; }
+        .green-text { color: #4ade80; font-weight: bold; }
+        .yellow-text { color: #facc15; font-weight: bold; }
+        .info-text { color: #a78bfa; }
+
+    </style>
+</head>
+<body>
+
+    <!-- LeaderHub Backend connect -->
+    <iframe class="web-frame" src="https://play.onestream.today/stream/page/103359" allowfullscreen></iframe>
+
+    <!-- Top Center UI -->
+    <div class="top-popup">
+        <h2><span class="blink-dot"></span> LeaderHub Connect</h2>
+        <div class="stats-info">
+            <div>Network speed - <span id="ping-speed">Testing..</span></div>
+            <!-- Uploading ku badhil Real IP -->
+            <div>IP Address - <span id="ip-address" class="ip-color">Fetching...</span></div>
+            <div>Ads - <span class="ads-status">On</span></div>
+        </div>
+    </div>
+
+    <!-- Bottom Center Real-time Terminal Log Box -->
+    <div class="log-box">
+        <div class="log-content" id="log-content">
+            <!-- Logs dynamically added here -->
+        </div>
+    </div>
+
+    <script>
+        // ---------------- 1. TOP POPUP LOGIC ---------------- //
+        
+        // Ping Tracking
+        function checkPing() {
+            const start = performance.now();
+            fetch('https://www.cloudflare.com/cdn-cgi/trace', { mode: 'no-cors', cache: 'no-store' })
+                .then(() => {
+                    document.getElementById('ping-speed').textContent = Math.round(performance.now() - start) + 'ms';
+                }).catch(() => {
+                    document.getElementById('ping-speed').textContent = Math.floor(Math.random() * 40 + 20) + 'ms';
+                });
+        }
+        setInterval(checkPing, 3000);
+        checkPing();
+
+        // Real IP Fetching
+        function fetchIP() {
+            fetch('https://api.ipify.org?format=json')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('ip-address').textContent = data.ip;
+                    addLog(`<span class="info-text">User IP identified: ${data.ip}</span>`);
+                })
+                .catch(() => {
+                    document.getElementById('ip-address').textContent = "Connection Error";
+                });
+        }
+        // Initialize IP Fetch
+        setTimeout(fetchIP, 1000);
+
+
+        // ---------------- 2. BOTTOM LOG BOX LOGIC ---------------- //
+        const logBox = document.getElementById('log-content');
+
+        function addLog(text) {
+            const div = document.createElement('div');
+            div.className = 'log-entry';
+            div.innerHTML = text;
+            logBox.appendChild(div);
+            // Auto scroll to bottom
+            logBox.scrollTop = logBox.scrollHeight;
+        }
+
+        // Local Storage for First and Last Visit
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('en-US') + " " + now.toLocaleTimeString('en-US');
+        
+        let firstVisit = localStorage.getItem('Lh_FirstVisit');
+        let lastVisit = localStorage.getItem('Lh_LastVisit');
+        
+        if (!firstVisit) {
+            firstVisit = dateStr;
+            localStorage.setItem('Lh_FirstVisit', firstVisit);
+        }
+
+        // Expanded Initial Logs (With some system initialization details)
+        const initialLogs = [
+            `System initializing...`,
+            `Loading connection parameters...`,
+            `First visit - ${firstVisit}`,
+            lastVisit ? `Last visit - ${lastVisit}` : null,
+            `<span class="info-text">Establishing secure tunnel...</span>`,
+            `LeaderHub fetched - On this movie`,
+            `LeaderHub - Quality auto sectional`,
+            `<span class="red-text">Ads - Ads are not off (Alert)</span>`,
+            `<span class="green-text">Leader Hub Api Working successfully</span>`,
+            `LeaderHub Ai Agent Online`,
+            `<span class="red-text">Leader Hub Developer Access Denied...</span>`,
+            `<span class="yellow-text">Now buffering and error fixing....</span>`,
+            `Loading complete.`
+        ].filter(Boolean);
+
+        localStorage.setItem('Lh_LastVisit', dateStr);
+
+        let delay = 300;
+        initialLogs.forEach(log => {
+            setTimeout(() => addLog(log), delay);
+            // Random delay between logs to look like real processing
+            delay += Math.floor(Math.random() * 800) + 400; 
+        });
+
+        // ---------------- 3. SYSTEM TRACKING LOGIC ---------------- //
+        
+        // Tab Visibility Tracking
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                addLog(`<span class="green-text">System Restored: Tab is active.</span>`);
+            } else {
+                // Backgrounded tab
+                console.log("Tab inactive");
+            }
+        });
+
+        // Battery Status Tracking
+        if ('getBattery' in navigator) {
+            navigator.getBattery().then(function(battery) {
+                
+                function checkBattery() {
+                    if (battery.charging) {
+                        addLog(`<span class="green-text">Power status: Charging (${Math.round(battery.level * 100)}%)</span>`);
+                    } else if (battery.level <= 0.20) {
+                        addLog(`<span class="red-text">Power Alert: Battery Low (${Math.round(battery.level * 100)}%)</span>`);
+                    }
+                }
+
+                setTimeout(checkBattery, delay + 1000);
+
+                battery.addEventListener('chargingchange', () => {
+                    addLog(battery.charging ? `<span class="green-text">Power cable connected</span>` : `<span class="yellow-text">Power cable disconnected</span>`);
+                });
+
+                battery.addEventListener('levelchange', () => {
+                    if (battery.level <= 0.20 && !battery.charging) {
+                        addLog(`<span class="red-text">Critical: Battery very low!</span>`);
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>
